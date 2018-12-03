@@ -1,0 +1,10 @@
+{
+    "frameworks": {
+        "netstandard2.0":  {
+            "dependencies":  {
+                "Microsoft.Azure.EventGrid": "1.4.0",
+                "WindowsAzure.Storage": "9.3.3"
+            }
+        }
+    }
+}
