@@ -11,7 +11,23 @@ Azure Functions can store its host keys in a file if the environmental variable 
 # Steps
 0. Create an Azure Storage Account and copy the Acces Key
 1. Deploy Knative Servicing and it's required dependencies - https://knative.dev/docs/install/any-kubernetes-cluster/#installing-the-serving-component
-    * I used a minimal istio install and a Real DNS configuration
+    ## Core Components 
+    * kubectl apply --filename https://github.com/knative/serving/releases/download/v0.13.0/serving-crds.yaml
+    * kubectl apply --filename https://github.com/knative/serving/releases/download/v0.13.0/serving-core.yaml
+
+    ## Istio
+    * curl -L https://git.io/getLatestIstio | sh -
+    * cd istio-${ISTIO_VERSION}
+    * for i in install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $i; done
+    * kubectl create ns istio-system
+    * kubectl apply --filename ./deploy/istio-lean.yaml
+    * kubectl apply --filename https://github.com/knative/serving/releases/download/v0.13.0/serving-istio.yaml
+    * kubectl --namespace istio-system get service istio-ingressgateway
+        * Copy External IP Address and Create DNS A Record pointting *.knative.bjdcsa.cloud
+    * kubectl patch configmap/config-domain \
+        --namespace knative-serving \
+        --type merge \
+        --patch '{"data":{"knative.bjdcsa.cloud":""}}'
 2. cd src
 3. docker build -t {docker-repo}/knative:1.4 . 
 4. docker push {docker-repo}/knative:1.4 
