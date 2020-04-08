@@ -1,11 +1,10 @@
-data:
-  AzureWebJobsStorage: ''
-  FUNCTIONS_WORKER_RUNTIME: ZG90bmV0
 apiVersion: v1
 kind: Secret
 metadata:
   name: simple
-  namespace: default
+data:
+  AzureWebJobsStorage: ''
+  FUNCTIONS_WORKER_RUNTIME: ZG90bmV0
 ---
 apiVersion: v1
 kind: Secret
@@ -17,7 +16,7 @@ stringData:
     {
       "masterKey": {
         "name": "master",
-        "value": "{REPLACEME}",
+        "value": "{REPLACME}",
         "encrypted": false
       },
       "functionKeys": [ ]
@@ -27,7 +26,7 @@ stringData:
       "keys": [
         {
           "name": "default",
-          "value": "{REPLACEME}",
+          "value": "{REPLACME}",
           "encrypted": false
         }
       ]
@@ -93,4 +92,3 @@ spec:
         secret:
           secretName: azure-functions-secrets
 ---
-

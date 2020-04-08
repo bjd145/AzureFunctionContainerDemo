@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: azure-function-runtime-secrets
+data:
+  AzureWebJobsStorage: ''
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: azure-functions-secrets
+stringData:
+  host.json: |-
+    {
+      "masterKey": {
+        "name": "master",
+        "value": "{REPLACME}",
+        "encrypted": false
+      },
+      "functionKeys": [ ]
+    }
+  httpTrigger.json: |-
+    {
+      "keys": [
+        {
+          "name": "default",
+          "value": "{REPLACME}",
+          "encrypted": false
+        }
+      ]
+    }
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: azure-function-test
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/target: "10"
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "10"
+    spec:
+      containers:
+      - image: {docker-repo}/knative:1.4
+        ports:
+        - containerPort: 80
+        env:
+          - name: AzureWebJobsStorage
+            valueFrom:
+              secretKeyRef:
+                name: azure-function-runtime-secrets
+                key: AzureWebJobsStorage
+          - name: FUNCTIONS_WORKER_RUNTIME
+            value: "dotnet"
+          - name: AzureWebJobsSecretStorageType
+            value: files   
+        volumeMounts:
+          - name: secrets
+            mountPath: "/azure-functions-host/Secrets"
+      volumes:
+      - name: secrets
+        secret:
+          secretName: azure-functions-secrets
